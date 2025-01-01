@@ -9,8 +9,27 @@ using namespace std;
 
 void get_URL( const string& host, const string& path )
 {
-  cerr << "Function called: get_URL(" << host << ", " << path << ")\n";
-  cerr << "Warning: get_URL() has not been implemented yet.\n";
+  // cerr << "Function called: get_URL(" << host << ", " << path << ")\n";
+  // cerr << "Warning: get_URL() has not been implemented yet.\n";
+
+  Address dest_addr(host, "80");  // port 80 for http service
+  TCPSocket tcp_sock;  tcp_sock.connect(dest_addr);  // telnet cs144.keithw.org http
+  std::vector<std::string> bufs = {  // string_view is a pointer to a position in the char array
+    "GET " + path + " HTTP/1.1\r\n",
+    "Host: " + host + "\r\n",
+    "Connection: close\r\n",
+    "\r\n"  // an empty line to terminate the http request
+  };
+  tcp_sock.write(bufs);
+
+  std::string reply_line;
+  while (true) {
+    tcp_sock.read(reply_line);
+    if (reply_line.size())
+      std::cout << reply_line;
+    else
+      break;
+  }
 }
 
 int main( int argc, char* argv[] )
